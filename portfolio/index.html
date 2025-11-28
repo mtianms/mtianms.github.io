@@ -15,7 +15,6 @@
 	<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap"
 		rel="stylesheet">
 	<link rel="stylesheet" href="css/style.css">
-	<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
 	<script src="https://cdn.tailwindcss.com"></script>
 	<script>
 		tailwind.config = {
@@ -299,7 +298,9 @@
 		</button>
 		<div id="modalContainer"
 			class="relative bg-black rounded-2xl overflow-hidden shadow-2xl transform transition-transform duration-300 scale-95">
-			<div id="videoFrame" class="w-full h-full"></div>
+			<iframe id="videoFrame" class="w-full h-full" src="" title="Video player" frameborder="0"
+				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+				referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
 		</div>
 	</div>
 
@@ -315,7 +316,6 @@
 			const videoFrame = document.getElementById('videoFrame');
 			const modalContainer = document.getElementById('modalContainer');
 			const closeModalBtn = document.getElementById('closeModal');
-			let player; // Global Plyr instance
 
 			let currentItems = []; // Store currently filtered items
 			let itemsToShow = 10;
@@ -544,48 +544,27 @@
 				});
 			};
 
-
 			// Video Modal Logic
 			const openModal = (videoUrl, type) => {
+				// Handle YouTube and Drive links
+				let embedUrl = videoUrl;
+				if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be') || videoUrl.includes('drive.google.com')) {
+					const separator = videoUrl.includes('?') ? '&' : '?';
+					embedUrl = `${videoUrl}${separator}autoplay=1`;
+				}
+
+				videoFrame.src = embedUrl;
+
+				// Reset iframe classes
+				videoFrame.className = 'w-full h-full';
+
+				// Apply zoom for Google Drive to hide pop-out button
+				if (videoUrl.includes('drive.google.com')) {
+					videoFrame.classList.add('scale-[1.15]', 'origin-bottom');
+				}
+
 				// Reset classes
 				modalContainer.className = 'relative bg-black rounded-2xl overflow-hidden shadow-2xl transform transition-transform duration-300 scale-95 mx-auto';
-				videoFrame.className = 'w-full h-full'; // Reset iframe classes
-
-				// Handle YouTube with Plyr
-				if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
-					// Extract Video ID
-					let videoId = '';
-					if (videoUrl.includes('embed/')) {
-						videoId = videoUrl.split('embed/')[1].split('?')[0];
-					} else if (videoUrl.includes('v=')) {
-						videoId = videoUrl.split('v=')[1].split('&')[0];
-					} else if (videoUrl.includes('youtu.be/')) {
-						videoId = videoUrl.split('youtu.be/')[1].split('?')[0];
-					}
-
-					// Use Plyr div instead of iframe src for YouTube
-					videoFrame.removeAttribute('src');
-					videoFrame.innerHTML = `<div id="plyr-player" data-plyr-provider="youtube" data-plyr-embed-id="${videoId}"></div>`;
-
-					// Initialize Plyr
-					player = new Plyr('#plyr-player', {
-						autoplay: true,
-						controls: ['play-large', 'play', 'progress', 'current-time', 'mute', 'volume', 'captions', 'settings', 'pip', 'airplay', 'fullscreen'],
-					});
-
-				} else {
-					// Handle Google Drive (Fallback to Iframe)
-					let embedUrl = videoUrl;
-					if (videoUrl.includes('drive.google.com')) {
-						const separator = videoUrl.includes('?') ? '&' : '?';
-						embedUrl = `${videoUrl}${separator}autoplay=1`;
-						videoFrame.classList.add('scale-[1.15]', 'origin-bottom');
-					}
-
-					// Clear innerHTML (remove Plyr div if exists) and set src
-					videoFrame.innerHTML = '';
-					videoFrame.src = embedUrl;
-				}
 
 				// Apply dimensions based on type
 				if (type === 'vertical') {
@@ -615,15 +594,7 @@
 				setTimeout(() => {
 					videoModal.classList.add('hidden');
 					videoModal.classList.remove('flex');
-
-					// Destroy Plyr if exists
-					if (player) {
-						player.destroy();
-						player = null;
-					}
-
 					videoFrame.src = '';
-					videoFrame.innerHTML = ''; // Clear Plyr container
 				}, 300);
 				document.body.style.overflow = '';
 			};
@@ -739,8 +710,6 @@
 			}
 		});
 	</script>
-	<link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-	<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 </body>
 
 </html>
