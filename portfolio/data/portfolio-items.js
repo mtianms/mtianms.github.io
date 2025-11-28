@@ -58,7 +58,7 @@ const portfolioData = [
     },
     {
         "category": "ads",
-        "videoUrl": "https://drive.google.com/file/d/1MVT1vhuq5bGusTW4Wha3_ACYYUVDU8xl/preview",
+        "videoUrl": "https://www.youtube.com/embed/LHx9JqRuq-I",
         "thumbnail": "img/srts.jpg",
         "type": "square"
     },

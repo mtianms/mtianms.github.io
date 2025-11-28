@@ -289,18 +289,21 @@
 	<!-- Video Modal -->
 	<div id="videoModal"
 		class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-sm opacity-0 transition-opacity duration-300">
-		<button id="closeModal"
-			class="fixed top-6 right-6 z-[60] text-white/70 hover:text-white bg-black/50 hover:bg-black/80 rounded-full p-2 transition-all backdrop-blur-sm">
-			<svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
-				stroke="currentColor">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-			</svg>
-		</button>
 		<div id="modalContainer"
 			class="relative bg-black rounded-2xl overflow-hidden shadow-2xl transform transition-transform duration-300 scale-95">
-			<iframe id="videoFrame" class="w-full h-full" src="" title="Video player" frameborder="0"
-				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-				referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+			<button id="closeModal"
+				class="absolute top-4 right-4 z-10 text-white/70 hover:text-white bg-black/20 hover:bg-black/40 rounded-full p-2 transition-all backdrop-blur-sm">
+				<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+					stroke="currentColor">
+					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+				</svg>
+			</button>
+			<iframe id="videoFrame" class="w-full h-full hidden" src="" title="Video player" frameborder="0"
+				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+				allowfullscreen></iframe>
+			<video id="htmlVideoPlayer" class="w-full h-full hidden" controls playsinline controlsList="nodownload">
+				Your browser does not support the video tag.
+			</video>
 		</div>
 	</div>
 
@@ -314,6 +317,7 @@
 			// Modal Elements
 			const videoModal = document.getElementById('videoModal');
 			const videoFrame = document.getElementById('videoFrame');
+			const htmlVideoPlayer = document.getElementById('htmlVideoPlayer');
 			const modalContainer = document.getElementById('modalContainer');
 			const closeModalBtn = document.getElementById('closeModal');
 
@@ -546,23 +550,6 @@
 
 			// Video Modal Logic
 			const openModal = (videoUrl, type) => {
-				// Handle YouTube and Drive links
-				let embedUrl = videoUrl;
-				if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be') || videoUrl.includes('drive.google.com')) {
-					const separator = videoUrl.includes('?') ? '&' : '?';
-					embedUrl = `${videoUrl}${separator}autoplay=1`;
-				}
-
-				videoFrame.src = embedUrl;
-
-				// Reset iframe classes
-				videoFrame.className = 'w-full h-full';
-
-				// Apply zoom for Google Drive to hide pop-out button
-				if (videoUrl.includes('drive.google.com')) {
-					videoFrame.classList.add('scale-[1.15]', 'origin-bottom');
-				}
-
 				// Reset classes
 				modalContainer.className = 'relative bg-black rounded-2xl overflow-hidden shadow-2xl transform transition-transform duration-300 scale-95 mx-auto';
 
@@ -573,6 +560,41 @@
 					modalContainer.classList.add('h-[85vh]', 'aspect-square');
 				} else {
 					modalContainer.classList.add('w-full', 'max-w-5xl', 'aspect-video');
+				}
+
+				// Check if it's a Google Drive link
+				const driveRegex = /\/d\/([a-zA-Z0-9_-]+)/;
+				const driveMatch = videoUrl.match(driveRegex);
+
+				if (driveMatch && driveMatch[1]) {
+					// It's a Drive video -> Use Iframe with preview URL (Most Reliable)
+					// Note: Autoplay is not supported on Drive Preview iframes by Google
+					const fileId = driveMatch[1];
+					const embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
+
+					htmlVideoPlayer.classList.add('hidden');
+					htmlVideoPlayer.pause();
+					htmlVideoPlayer.src = '';
+					htmlVideoPlayer.onerror = null;
+
+					videoFrame.src = embedUrl;
+					videoFrame.classList.remove('hidden');
+				} else {
+					// It's YouTube or other -> Use Iframe with Autoplay
+					let embedUrl = videoUrl;
+					if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+						const separator = videoUrl.includes('?') ? '&' : '?';
+						// Add mute=1 to ensure autoplay works reliably
+						embedUrl = `${videoUrl}${separator}autoplay=1&mute=1`;
+					}
+
+					htmlVideoPlayer.classList.add('hidden');
+					htmlVideoPlayer.pause();
+					htmlVideoPlayer.src = '';
+					htmlVideoPlayer.onerror = null;
+
+					videoFrame.src = embedUrl;
+					videoFrame.classList.remove('hidden');
 				}
 
 				videoModal.classList.remove('hidden');
@@ -595,6 +617,8 @@
 					videoModal.classList.add('hidden');
 					videoModal.classList.remove('flex');
 					videoFrame.src = '';
+					htmlVideoPlayer.pause();
+					htmlVideoPlayer.src = '';
 				}, 300);
 				document.body.style.overflow = '';
 			};
