@@ -288,22 +288,20 @@
 
 	<!-- Video Modal -->
 	<div id="videoModal"
-		class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-sm opacity-0 transition-opacity duration-300">
-		<div id="modalContainer"
-			class="relative bg-black rounded-2xl overflow-hidden shadow-2xl transform transition-transform duration-300 scale-95">
+		class="fixed inset-0 z-50 hidden items-center justify-center bg-black/90 backdrop-blur-sm opacity-0 transition-opacity duration-300 px-4">
+		<div class="relative group">
 			<button id="closeModal"
-				class="absolute top-4 right-4 z-10 text-white/70 hover:text-white bg-black/20 hover:bg-black/40 rounded-full p-2 transition-all backdrop-blur-sm">
+				class="absolute -top-12 right-0 z-50 text-white/70 hover:text-white bg-white/10 hover:bg-white/20 rounded-full p-2 transition-all backdrop-blur-sm">
 				<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
 					stroke="currentColor">
 					<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
 				</svg>
 			</button>
-			<iframe id="videoFrame" class="w-full h-full hidden" src="" title="Video player" frameborder="0"
-				allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-				allowfullscreen></iframe>
-			<video id="htmlVideoPlayer" class="w-full h-full hidden" controls playsinline controlsList="nodownload">
-				Your browser does not support the video tag.
-			</video>
+			<div id="modalContainer"
+				class="relative bg-black rounded-2xl overflow-hidden shadow-2xl transform transition-transform duration-300 scale-95">
+				<iframe id="videoFrame" class="w-full h-full hidden" src="" title="Video player" frameborder="0"
+					allow="autoplay; clipboard-write; encrypted-media" allowfullscreen></iframe>
+			</div>
 		</div>
 	</div>
 
@@ -317,7 +315,7 @@
 			// Modal Elements
 			const videoModal = document.getElementById('videoModal');
 			const videoFrame = document.getElementById('videoFrame');
-			const htmlVideoPlayer = document.getElementById('htmlVideoPlayer');
+
 			const modalContainer = document.getElementById('modalContainer');
 			const closeModalBtn = document.getElementById('closeModal');
 
@@ -550,16 +548,24 @@
 
 			// Video Modal Logic
 			const openModal = (videoUrl, type) => {
-				// Reset classes
-				modalContainer.className = 'relative bg-black rounded-2xl overflow-hidden shadow-2xl transform transition-transform duration-300 scale-95 mx-auto';
+				// Reset aspect ratio classes and styles
+				modalContainer.classList.remove('aspect-[9/16]', 'aspect-square', 'aspect-video', 'h-[85vh]', 'w-full', 'max-w-5xl', 'max-w-[90vw]');
+				modalContainer.style.width = '';
+				modalContainer.style.height = '';
 
-				// Apply dimensions based on type
+				// Apply dimensions using CSS min() to respect both width and height constraints while maintaining ratio
 				if (type === 'vertical') {
-					modalContainer.classList.add('h-[85vh]', 'aspect-[9/16]');
+					// Ratio 9:16 (0.5625)
+					modalContainer.style.width = 'min(90vw, calc(85vh * 9/16))';
+					modalContainer.style.height = 'min(85vh, calc(90vw * 16/9))';
 				} else if (type === 'square') {
-					modalContainer.classList.add('h-[85vh]', 'aspect-square');
+					// Ratio 1:1
+					modalContainer.style.width = 'min(90vw, 85vh)';
+					modalContainer.style.height = 'min(85vh, 90vw)';
 				} else {
-					modalContainer.classList.add('w-full', 'max-w-5xl', 'aspect-video');
+					// Ratio 16:9 (1.7778) - Max width 5xl (approx 1024px/64rem)
+					modalContainer.style.width = 'min(90vw, calc(85vh * 16/9), 64rem)';
+					modalContainer.style.height = 'min(85vh, calc(90vw * 9/16))';
 				}
 
 				// Check if it's a Google Drive link
@@ -572,10 +578,7 @@
 					const fileId = driveMatch[1];
 					const embedUrl = `https://drive.google.com/file/d/${fileId}/preview`;
 
-					htmlVideoPlayer.classList.add('hidden');
-					htmlVideoPlayer.pause();
-					htmlVideoPlayer.src = '';
-					htmlVideoPlayer.onerror = null;
+
 
 					videoFrame.src = embedUrl;
 					videoFrame.classList.remove('hidden');
@@ -588,10 +591,7 @@
 						embedUrl = `${videoUrl}${separator}autoplay=1&mute=1`;
 					}
 
-					htmlVideoPlayer.classList.add('hidden');
-					htmlVideoPlayer.pause();
-					htmlVideoPlayer.src = '';
-					htmlVideoPlayer.onerror = null;
+
 
 					videoFrame.src = embedUrl;
 					videoFrame.classList.remove('hidden');
@@ -617,8 +617,7 @@
 					videoModal.classList.add('hidden');
 					videoModal.classList.remove('flex');
 					videoFrame.src = '';
-					htmlVideoPlayer.pause();
-					htmlVideoPlayer.src = '';
+
 				}, 300);
 				document.body.style.overflow = '';
 			};
