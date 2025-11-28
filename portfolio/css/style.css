@@ -1,0 +1,199 @@
+.gradient-text {
+    background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.portfolio-card {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(147, 197, 253, 0.05) 100%);
+    border: 1px solid rgba(59, 130, 246, 0.1);
+}
+
+.portfolio-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%);
+    opacity: 0;
+    transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+}
+
+.portfolio-card:hover::before {
+    opacity: 0.1;
+}
+
+.portfolio-card:hover {
+    border-color: rgba(59, 130, 246, 0.3);
+    box-shadow: 0 0 40px rgba(59, 130, 246, 0.3);
+}
+
+.portfolio-card-content {
+    position: relative;
+    z-index: 1;
+    display: block;
+}
+
+.back-button {
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.back-button:hover {
+    background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%);
+    border-color: transparent;
+}
+
+/* Masonry Grid Utilities */
+.aspect-horizontal {
+    aspect-ratio: 16 / 9;
+}
+
+.aspect-square {
+    aspect-ratio: 1 / 1;
+}
+
+.aspect-vertical {
+    aspect-ratio: 9 / 16;
+}
+
+/* Ensure images cover the area */
+.portfolio-card-content img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* Header Navigation */
+.header-nav {
+    backdrop-filter: blur(10px);
+    margin-top: calc(var(--base-size) * var(--phi));
+}
+
+.portfolio main {
+    padding-top: calc(var(--base-size) * var(--phi-squared));
+    padding-bottom: calc(var(--base-size) * var(--phi-squared));
+}
+
+.portfolio .max-w-7xl {
+    padding-left: calc(var(--base-size) * var(--phi));
+    padding-right: calc(var(--base-size) * var(--phi));
+}
+
+@media (min-width: 768px) {
+    .portfolio .max-w-7xl {
+        padding-left: calc(var(--base-size) * var(--phi-squared));
+        padding-right: calc(var(--base-size) * var(--phi-squared));
+    }
+}
+
+@media (min-width: 1024px) {
+    .portfolio .max-w-7xl {
+        padding-left: calc(var(--base-size) * var(--phi-cubed));
+        padding-right: calc(var(--base-size) * var(--phi-cubed));
+    }
+}
+
+.logo-text {
+    font-size: 1.5rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: white;
+    transition: color 0.3s ease;
+}
+
+.logo-text:hover {
+    color: #60a5fa;
+}
+
+.social-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: white;
+}
+
+.social-icon:hover {
+    border-color: #60a5fa;
+    background: rgba(96, 165, 250, 0.1);
+}
+
+/* Golden Ratio Typography */
+:root {
+    --golden-ratio: 1.618;
+    --base-size: 1rem;
+    --phi: 1.618;
+    --phi-squared: 2.618;
+    --phi-cubed: 4.236;
+}
+
+/* Typography based on Golden Ratio */
+.portfolio h1 {
+    font-size: calc(var(--base-size) * var(--phi-squared));
+    line-height: calc(var(--base-size) * var(--phi-squared) * var(--phi));
+}
+
+@media (min-width: 768px) {
+    .portfolio h1 {
+        font-size: calc(var(--base-size) * var(--phi-squared) * 1.2);
+    }
+}
+
+@media (min-width: 1024px) {
+    .portfolio h1 {
+        font-size: calc(var(--base-size) * var(--phi-squared) * 1.4);
+    }
+}
+
+.portfolio h2 {
+    font-size: calc(var(--base-size) * var(--phi));
+    line-height: calc(var(--base-size) * var(--phi) * var(--phi));
+}
+
+@media (min-width: 768px) {
+    .portfolio h2 {
+        font-size: calc(var(--base-size) * var(--phi) * 1.2);
+    }
+}
+
+.portfolio p {
+    font-size: var(--base-size);
+    line-height: calc(var(--base-size) * var(--phi));
+}
+
+@media (min-width: 768px) {
+    .portfolio p {
+        font-size: calc(var(--base-size) * 1.125);
+    }
+}
+
+/* Spacing based on Golden Ratio */
+.golden-spacing-small {
+    margin-bottom: calc(var(--base-size) * var(--phi));
+}
+
+.golden-spacing-medium {
+    margin-bottom: calc(var(--base-size) * var(--phi-squared));
+}
+
+.golden-spacing-large {
+    margin-bottom: calc(var(--base-size) * var(--phi-cubed));
+}
+
+.golden-spacing-section {
+    display: flex;
+    flex-direction: column;
+    gap: calc(var(--base-size) * var(--phi-cubed));
+}
